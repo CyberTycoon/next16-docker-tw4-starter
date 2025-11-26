@@ -18,7 +18,8 @@
     "lint": "eslint --ext .js,.jsx,.ts,.tsx .",
     "ci": "pnpm -s lint && pnpm -s typecheck && pnpm -s build",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:docker": "bash ./scripts/test-docker.sh"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.17",
