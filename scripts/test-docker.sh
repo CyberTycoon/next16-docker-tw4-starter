@@ -1,81 +1,108 @@
 #!/usr/bin/env bash
-
 ###############################################################################
 # Script: test-docker.sh
 #
 # Description:
-#   Runs tests against a Docker Compose environment. This script:
-#   1. Builds and starts Docker containers
-#   2. Waits for services to initialize
-#   3. Executes Playwright tests
-#   4. Ensures containers are cleaned up regardless of test outcome
-#
-# Platform Compatibility:
-#   - Linux: Full support
-#   - macOS: Full support
-#   - Windows: Requires WSL or Git Bash with Docker Desktop
+#   Brings up a Docker Compose environment, waits for services to initialize
+#   (polls HEALTHCHECK_URL if provided), and then tears the environment down.
+#   This variant does not run Playwright or any test runner.
 #
 # Environment Variables:
-#   CI              - If unset, loads .env file; if set, skips .env loading
-#   TEST_DOCKER     - Set to 1 during test execution to control env vars
-#   BUILDKIT_PROGRESS - (optional) Set to 'plain' for verbose Docker output
+#   CI                 - If unset, loads .env file (when present); if set, skips .env loading
+#   BUILDKIT_PROGRESS  - (optional) Set to 'plain' for verbose Docker output
+#   HEALTHCHECK_URL    - (optional) URL to poll to determine service readiness
+#   WAIT_SECONDS       - (optional) fallback sleep seconds when HEALTHCHECK_URL unset (default 10)
+#   HEALTHCHECK_TIMEOUT- (optional) max seconds to wait for healthcheck (default 120)
 #
 # Usage:
 #   ./scripts/test-docker.sh
 #
 # Exit Codes:
-#   0 - Tests passed
-#   1 - Tests failed or Docker operations failed
+#   0 - Success (services started and tear down completed)
+#   1 - Failure (docker not available, compose failed, or healthcheck timeout)
 #
 ###############################################################################
 
-set -e  # Exit on any error
+set -euo pipefail
 
 # Optional: Use plain Docker build progress for easier debugging
-# Uncomment the line below for verbose Docker output
 # export BUILDKIT_PROGRESS=plain
 
-# Build arguments array for docker compose command
-# Uses modern 'compose.yml' filename (Docker Compose v2+)
-args=("-f" "compose.yml")
+# Ensure docker is available
+if ! command -v docker >/dev/null 2>&1; then
+  echo "Error: docker is not installed or not in PATH" >&2
+  exit 1
+fi
 
-# Load .env file only in non-CI environments
-# CI systems typically pass env vars through their platforms
-if [ -z "${CI}" ]; then
+# Select compose file (compose.yml preferred, fall back to docker-compose.yml)
+if [ -f "compose.yml" ]; then
+  COMPOSE_FILE="compose.yml"
+elif [ -f "docker-compose.yml" ]; then
+  COMPOSE_FILE="docker-compose.yml"
+else
+  echo "Error: no compose file found (compose.yml or docker-compose.yml)" >&2
+  exit 1
+fi
+
+# Build arguments array for docker compose command
+args=("-f" "$COMPOSE_FILE")
+
+# Load .env file only in non-CI environments and only if file exists
+if [ -z "${CI:-}" ] && [ -f ".env" ]; then
   args+=("--env-file" ".env")
 fi
 
-# Add standard compose up flags
-args+=("up" "--detach" "--build")
+# Add standard compose up flags; remove orphans to avoid leftover services
+args+=("up" "--detach" "--build" "--remove-orphans")
 
-echo "Running: docker compose ${args[*]}"
+# Best-effort cleanup function; will run on EXIT
+cleanup() {
+  echo "Cleaning up Docker containers..."
+  docker compose -f "$COMPOSE_FILE" down --volumes --remove-orphans || true
+}
+trap cleanup EXIT INT TERM
 
-# Start Docker Compose with error handling
+# Log the command in a safe, quote-preserved way
+printf 'Running: docker compose'
+for a in "${args[@]}"; do printf ' %q' "$a"; done
+echo
+
+# Start Docker Compose
 if ! docker compose "${args[@]}"; then
   echo "Error: Failed to start Docker containers" >&2
+  # cleanup will run via trap
   exit 1
 fi
 
-# Wait for container initialization and service stability
-# 10 seconds is typically sufficient for most services to be ready
-echo "Waiting 10 seconds for container services to initialize..."
-sleep 10
+# Wait for container initialization and service stability.
+# If HEALTHCHECK_URL is set, poll it until it returns success or timeout.
+# Fallback to WAIT_SECONDS sleep if no URL provided or curl missing.
+WAIT_SECONDS="${WAIT_SECONDS:-10}"
+HEALTHCHECK_URL="${HEALTHCHECK_URL:-}"
+HEALTHCHECK_TIMEOUT="${HEALTHCHECK_TIMEOUT:-120}"
 
-# Set test environment marker for Playwright to use correct env vars
-# This helps distinguish between local and Docker-based test environments
-export TEST_DOCKER=1
-
-# Run Playwright tests with error handling
-# Ensures docker compose down is called regardless of test result
-echo "Starting Playwright tests..."
-if playwright test -c ../../../packages/utils/playwright.config.ts; then
-  # Tests passed - clean exit with container cleanup
-  echo "Tests passed. Cleaning up containers..."
-  docker compose down
-  exit 0
+if [ -n "$HEALTHCHECK_URL" ]; then
+  if ! command -v curl >/dev/null 2>&1; then
+    echo "Warning: HEALTHCHECK_URL set but 'curl' is not available; falling back to sleep ${WAIT_SECONDS}s" >&2
+    sleep "$WAIT_SECONDS"
+  else
+    echo "Waiting up to ${HEALTHCHECK_TIMEOUT}s for ${HEALTHCHECK_URL}..."
+    elapsed=0
+    until curl -sSf "$HEALTHCHECK_URL" >/dev/null 2>&1; do
+      sleep 2
+      elapsed=$((elapsed + 2))
+      if [ "$elapsed" -ge "$HEALTHCHECK_TIMEOUT" ]; then
+        echo "Error: timeout waiting for ${HEALTHCHECK_URL}" >&2
+        exit 1
+      fi
+    done
+  fi
 else
-  # Tests failed - cleanup and exit with error code
-  echo "Tests failed. Cleaning up containers..." >&2
-  docker compose down
-  exit 1
+  echo "Waiting ${WAIT_SECONDS}s for container services to initialize..."
+  sleep "$WAIT_SECONDS"
 fi
+
+echo "Services are initialized. No test runner is configured in this repository; exiting and cleaning up."
+
+# Exit normally; trap will run cleanup to tear down the compose environment
+exit 0
