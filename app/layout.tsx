@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import "../styles/globals.css";
 import BaseHeader from "@/components/base-header";
+import { Analytics } from "@vercel/analytics/next"
 
 export const metadata: Metadata = {
   title: "Next.js 16 Starter - Docker + TypeScript + Tailwind CSS",
@@ -22,6 +23,7 @@ export default function RootLayout({
           <BaseHeader />
           <main>{children}</main>
         </ThemeProvider>
+         <Analytics/>
       </body>
     </html>
   );
