@@ -19,8 +19,12 @@ export default function Home() {
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center mt-32 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl w-full text-center space-y-8">
-          {/* Badge */}
-          <div className="inline-block">
+          {/* Version Badge */}
+          <div className="flex flex-col items-center gap-2">
+            <span className="inline-flex items-center rounded-full bg-emerald-50 dark:bg-emerald-950/30 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-600/20">
+              Next.js v16.0.10
+            </span>
+            {/* Badge */}
             <span className="inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-950/30 px-4 py-2 text-sm font-medium text-blue-700 dark:text-blue-300 ring-1 ring-inset ring-blue-600/20">
               ✨ Modern Starter Template
             </span>
