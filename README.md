@@ -15,7 +15,7 @@ This template gives you a minimal but opinionated foundation so you can focus on
 
 ## 🚀 Features
 
-- **Next.js 16.0.4** with App Router
+- **Next.js 16.1.0** with App Router
 - **Next-Auth v5** complete open source authentication solution
 - **TypeScript** preconfigured
 - **PNPM** workspace-friendly setup

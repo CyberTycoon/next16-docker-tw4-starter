@@ -1,4 +1,4 @@
-name: CI
+name: Next.js 16.1.0 CI
 
 on:
   push:
