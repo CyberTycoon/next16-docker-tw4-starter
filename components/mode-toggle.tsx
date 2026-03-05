@@ -14,12 +14,12 @@ export default function ModeToggle() {
     <button
       aria-label="Toggle Dark Mode"
       type="button"
-      className="inline-flex items-center justify-center rounded-lg p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+      className="group inline-flex items-center justify-center rounded-lg p-2.5 text-neutral-600 dark:text-neutral-400 hover:text-neutral-950 dark:hover:text-neutral-50 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-300 ease-out"
       onClick={handleToggle}
     >
       <DynamicIcon
         name={theme === "dark" ? "sun" : "moon"}
-        className="h-5 w-5 rotate-0 scale-100 transition-all"
+        className="h-5 w-5 transition-transform duration-500 ease-out group-hover:rotate-12"
       />
     </button>
   );

@@ -2,75 +2,72 @@ import { DemoBadge } from "@/components/demo-badge";
 
 export default function Home() {
   return (
-    <div className="min-h-screen w-full relative overflow-hidden">
-      {/* Animated gradient background */}
+    <div className="min-h-screen w-full bg-white dark:bg-[#0a0a0a] transition-colors duration-500 ease-out">
+      {/* Subtle grid background */}
       <div
-        className="absolute inset-0 z-0 opacity-40 dark:opacity-20"
+        className="absolute inset-0 z-0 opacity-[0.03] dark:opacity-[0.05]"
         style={{
-          backgroundImage: `
-            radial-gradient(ellipse at 20% 30%, rgba(59, 130, 246, 0.5) 0%, transparent 60%),
-            radial-gradient(ellipse at 80% 70%, rgba(168, 85, 247, 0.4) 0%, transparent 70%),
-            radial-gradient(ellipse at 60% 20%, rgba(236, 72, 153, 0.3) 0%, transparent 50%),
-            radial-gradient(ellipse at 40% 80%, rgba(34, 197, 94, 0.3) 0%, transparent 65%)
-          `,
+          backgroundImage: `linear-gradient(to right, currentColor 1px, transparent 1px),
+                           linear-gradient(to bottom, currentColor 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
         }}
       />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center mt-32 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl w-full text-center space-y-8">
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl w-full text-center space-y-12">
           {/* Version Badge */}
-          <div className="flex flex-col items-center gap-2">
-            <span className="inline-flex items-center rounded-full bg-emerald-50 dark:bg-emerald-950/30 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-600/20">
+          <div className="flex flex-col items-center gap-3 animate-fade-in">
+            <span className="inline-flex items-center px-3 py-1 text-xs font-medium tracking-wide text-neutral-600 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-800 rounded-full transition-colors duration-300">
               Next.js v16.1.0
             </span>
-            {/* Badge */}
-            <span className="inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-950/30 px-4 py-2 text-sm font-medium text-blue-700 dark:text-blue-300 ring-1 ring-inset ring-blue-600/20">
-              ✨ Modern Starter Template
+            <span className="inline-flex items-center px-4 py-1.5 text-sm font-medium tracking-wide text-neutral-900 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-700 rounded-full transition-colors duration-300">
+              Modern Starter Template
             </span>
           </div>
 
           {/* Heading */}
-          <div className="space-y-4">
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight">
-              <span className="bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
-                Build Amazing Apps
-              </span>
+          <div className="space-y-6">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-semibold tracking-tight text-neutral-950 dark:text-neutral-50 transition-colors duration-500">
+              Build Amazing Apps
             </h1>
-            <p className="text-xl sm:text-2xl text-gray-600 dark:text-gray-300 font-light max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-neutral-600 dark:text-neutral-400 font-normal max-w-2xl mx-auto leading-relaxed transition-colors duration-500">
               Next.js 16 + Docker + Tailwind CSS 4 + Auth.js 5 + TypeScript starter template to
               kickstart your next project with modern best practices.
             </p>
           </div>
 
           {/* Tech Stack */}
-          <div className="flex flex-wrap gap-3 justify-center items-center">
-            <span className="px-3 py-1 text-sm font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full">
-              Next.js 16
-            </span>
-            <span className="px-3 py-1 text-sm font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full">
-              TypeScript
-            </span>
-            <span className="px-3 py-1 text-sm font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full">
-              Docker
-            </span>
-            <span className="px-3 py-1 text-sm font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full">
-              Tailwind CSS 4
-            </span>
+          <div className="flex flex-wrap gap-2 justify-center items-center">
+            {['Next.js 16', 'TypeScript', 'Docker', 'Tailwind CSS 4'].map((tech) => (
+              <span
+                key={tech}
+                className="px-4 py-1.5 text-sm font-medium text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-800 rounded-full hover:border-neutral-400 dark:hover:border-neutral-600 transition-all duration-300 cursor-default"
+              >
+                {tech}
+              </span>
+            ))}
           </div>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <button className="inline-flex items-center justify-center px-8 py-3 text-base font-semibold text-white bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 cursor-pointer">
-              <a
-                href="https://github.com/ehsanghaffar/next16-docker-tw4-starter"
-                target="_blank"
-                rel="noopener noreferrer"
+            <a
+              href="https://github.com/cybertycoon/next16-docker-tw4-starter"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center justify-center px-8 py-3.5 text-base font-medium text-white dark:text-black bg-neutral-950 dark:bg-neutral-50 rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all duration-300 ease-out"
+            >
+              Get Started
+              <svg
+                className="ml-2 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                Get Started →
-              </a>
-            </button>
-            <button className="inline-flex items-center justify-center px-8 py-3 text-base font-semibold text-gray-900 dark:text-white bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
+            <button className="inline-flex items-center justify-center px-8 py-3.5 text-base font-medium text-neutral-900 dark:text-neutral-100 bg-transparent border border-neutral-300 dark:border-neutral-700 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-all duration-300 ease-out">
               Learn More
             </button>
           </div>
